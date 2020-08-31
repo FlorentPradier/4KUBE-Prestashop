@@ -12,4 +12,3 @@ spec:
   chart:
     git: git@github.com:FlorentPradier/4KUBE-Prestashop.git
     path: prestashop
-    ref: master
