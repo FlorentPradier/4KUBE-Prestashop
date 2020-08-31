@@ -1,0 +1,19 @@
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: podinfo-dev
+  namespace: dev
+  annotations:
+    fluxcd.io/automated: "true"
+    filter.fluxcd.io/chart-image: glob:dev-*
+spec:
+  releaseName: podinfo-dev
+  chart:
+    git: git@github.com:FlorentPradier/4KUBE-Prestashop.git
+    path: prestshop
+    ref: master
+  values:
+    image:
+      repository: bitnami/prestashop
+      tag: 1.7

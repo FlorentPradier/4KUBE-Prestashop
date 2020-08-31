@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prestashop.fullname" . }}
+  labels:
+    {{- include "prestashop.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "prestashop.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      labels:
+        {{- include "prestashop.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+        - {{ include "prestashop.fullname" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+          env:  
+            - name: MARIADB_HOST
+              value: {{ .Release.Name }}-mariadb
+            - name: ALLOW_EMPTY_PASSWORD
+              value: "yes"
+            - name: PRESTASHOP_DATABASE_PASSWORD
+              value: {{ .Values.mariadb.database.mariadbpassword | quote }}
+            - name: PRESTASHOP_HOST
+              value: {{ include "prestashop.fullname" . }}
+            - name: PRESTASHOP_COOKIE_CHECK_IP
+              value: "false"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
