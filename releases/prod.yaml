@@ -2,7 +2,8 @@
 apiVersion: helm.fluxcd.io/v1
 kind: HelmRelease
 metadata:
-  name: prestashop-dev
+  name: prestashop-prod
+  namespace: prod
   annotations:
     fluxcd.io/automated: "true"
     filter.fluxcd.io/chart-image: glob:dev-*
@@ -11,3 +12,4 @@ spec:
   chart:
     git: git@github.com:FlorentPradier/4KUBE-Prestashop.git
     path: prestashop
+    ref: master
